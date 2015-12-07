@@ -23,6 +23,7 @@ fail_count = 0
 start = time.clock()
 
 
+
 class Person:
     def __init__(self,
                  name,
