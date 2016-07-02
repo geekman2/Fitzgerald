@@ -1,16 +1,16 @@
+import pickle
 import random
 import itertools
 import pandas as pd
 from matplotlib import pyplot as plt
+from nltk.corpus import wordnet
 
-locations = ["1234 Alpha Lane", " 456 Bravo Street", " 2345 Charlie Avenue",
-             "4567 Delta Place", "795 Echo Drive"]  # Sample Locations
 
-people = ["Alfred", "Becka", "Chad", "Dale", "Emily"]  # Sample People
 time_frames = {}
 stops = []
 
-#TODO Refactor out test code
+
+# TODO Refactor out test code
 
 def get_time_between(locA, locB):
     """
@@ -37,7 +37,27 @@ def get_time_between(locA, locB):
             return move_time
 
 
-def generate_test_cases():
+def generate_test_cases(num_people=3, num_locations=3):
+    # TODO write docstring
+    people = []
+    locations = []
+    nouns = pickle.load(open("nouns.p","rb"))
+    adjectives = pickle.load(open("adjectives.p","rb"))
+    suffixes = ["St", "Dr", "Pl", "Rd", "Blvd"]
+    words = nouns+adjectives
+    names = open("names.txt", "r").readlines()
+    random.shuffle(names)
+    random.shuffle(words)
+    for word in words[:num_locations]:
+        title = word[0].upper()+word[1:word.find("_")]
+        street_name = "{} {} {}".format(random.randint(1000, 9999),
+                                        title,
+                                        random.choice(suffixes))
+        locations.append(street_name)
+    for i in range(0, num_people):
+        name = names.pop()
+        people.append(name[:-2])
+
     for person in people:
         current_time = 0
         place_indexes = [(lambda x: random.randint(0, len(locations) - 1))(x) for x in range(3)]
@@ -64,16 +84,16 @@ def generate_test_cases():
                      "leave": leave_after,
                      }
                 )
-
-stops_dataframe = pd.DataFrame(stops)
-
+    return people,locations
 
 def plot_route():
     for pers in people:
         personal_stops = stops_dataframe.loc[stops_dataframe["Name"] == pers]
         times = sorted(list(personal_stops["due"]) + list(personal_stops["leave"]))
         places = [val for val in personal_stops["from"] for _ in (0, 1)]
-        plt.plot(times, places, linewidth=10)
+        plt.plot(times, places, linewidth=1)
+
+    plt.plot(stops_dataframe["leave"], stops_dataframe["to"], linewidth=10, color="black", linestyle="dotted")
 
     plt.xticks(range(0, 40))
     plt.yticks(range(len(locations)), locations)
@@ -84,6 +104,13 @@ def plot_route():
 
 
 def route_builder():
-    order = random.shuffle(list[stops_dataframe["from"]])
+    all_times = stops_dataframe["leave"]
+    all_places = stops_dataframe["to"]
+    order = random.shuffle(list[stops_dataframe["to"]])
 
 
+people,locations = generate_test_cases(5, 5)
+stops_dataframe = pd.DataFrame(stops)
+stops_dataframe = stops_dataframe.sort_values(by=["due"])
+print stops_dataframe
+plot_route()
