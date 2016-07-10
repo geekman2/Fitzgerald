@@ -60,12 +60,18 @@ def generate_test_cases(num_people=3, num_locations=3):
 
     for person in people:
         current_time = 0
-        place_indexes = [(lambda x: random.randint(0, len(locations) - 1))(x) for x in range(3)]
+        num_locations = 3
+        #Create a list of num_locations random numbers that correspond to indices of locations
+        place_indexes = [(lambda x: random.randint(0, len(locations) - 1))(x) for x in range(num_locations)]
         for ii, place in enumerate(place_indexes):
+            #Generate a random time to arrive at the current location
             arrive_at = current_time + random.randint(1, 5)
+            #Generate random leave time that is after the arrival time
             leave_after = arrive_at + random.randint(1, 5)
             current_time = leave_after
+
             if ii == 0:
+                #If this is the first location, generate a home location
                 home = random.randint(0, len(locations) - 1)
                 stops.append(
                     {"Name": person,
@@ -85,6 +91,7 @@ def generate_test_cases(num_people=3, num_locations=3):
                      }
                 )
     return people,locations
+
 
 def plot_route():
     for pers in people:
